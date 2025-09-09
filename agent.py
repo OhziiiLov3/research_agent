@@ -17,6 +17,7 @@ from typing import List
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import PydanticOutputParser
 from langchain_openai import ChatOpenAI
+import gradio as gr
 
 
 load_dotenv()
@@ -186,4 +187,15 @@ def research_agent(message, history, verbose: bool = False):
 
     return answer
 
-research_agent("Tell how to plan a surfing trip to pacfica, ca", [], verbose=True)
+# research_agent("Tell how to plan a surfing trip to pacfica, ca", [], verbose=True)
+
+
+
+def chat_wrapper(message, history, verbose=False):
+    return research_agent(message, history, verbose=verbose)
+
+gr.ChatInterface(
+    fn=chat_wrapper,
+    title="Research Agent Chat Bot",
+    type="messages"
+).launch(debug=True)
