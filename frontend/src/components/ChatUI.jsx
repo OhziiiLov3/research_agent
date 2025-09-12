@@ -40,7 +40,7 @@ export default function ChatUI() {
             sx={{
               p: 1,
               my: 1,
-              maxWidth: "60%",
+              maxWidth: "90%",
               alignSelf: m.role === "user" ? "flex-end" : "flex-start",
               bgcolor: m.role === "user" ? "primary.light" : "grey.300",
             }}
