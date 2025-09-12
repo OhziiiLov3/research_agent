@@ -38,7 +38,7 @@ def execute_plan(plan: ExecutionPlan, query: str, verbose: bool = False):
     for step in plan.plan:
         # ---- Executor LLM decides which tool and query to use ----
         decision_prompt = ChatPromptTemplate.from_messages([
-            ("system","You are a lightweight executor LLM. Choose the best tool for this step: wikipedia, tavily or pdf. "
+            ("system","You are a lightweight executor LLM. Choose the best tool for this step: wikipedia or tavily"
             "Return JSON like {{\"tool\": \"wikipedia\", \"query\": \"...\"}}"
             ),
             ("human", "Step: {step}")
@@ -70,10 +70,34 @@ def execute_plan(plan: ExecutionPlan, query: str, verbose: bool = False):
             print(f"[Executor] Result: {result}\n")
 
     # ---- Final synthesis with main LLM ----
+    # synthesis_prompt = ChatPromptTemplate.from_messages([
+    #     ("system", "You are a helpful research assistant. Use the observations to answer clearly and concisely."),
+    #     ("human", "User query: {query}\n\nObservations: {observations}")
+    # ])
     synthesis_prompt = ChatPromptTemplate.from_messages([
-        ("system", "You are a helpful research assistant. Use the observations to answer clearly and concisely."),
-        ("human", "User query: {query}\n\nObservations: {observations}")
-    ])
+    ("system", 
+     "You are a professional research assistant. "
+     "Your job is to take raw observations from tools (snippets, search results, wiki entries) "
+     "and synthesize them into a clear, polished, concise, and  well-structured answer. "
+     "Guidelines:\n"
+     "- Write in clear, natural language.\n"
+     "- Remove redundant or irrelevant details.\n"
+     "- Summarize concisely, but include key facts.\n"
+     "- If multiple sources conflict, note the disagreement.\n"
+     "- End with a short, actionable takeaway."
+
+     "Format the answer for Slack:\n"
+     "- Use bold for headings.\n"
+     "- Use bullet points for lists.\n"
+     "- Use italics for key terms.\n"
+     "- Keep paragraphs under 3 lines."
+     "- Don't use ** **."
+     "- suggest links with 3 resources in a bullets list"
+
+    ),
+    ("human", "User query: {query}\n\nObservations: {observations}")
+])
+
 
     synthesis_chain = synthesis_prompt | llm
     final_answer = synthesis_chain.invoke({

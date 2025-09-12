@@ -8,7 +8,7 @@ class ExecutionPlan(BaseModel):
 
 class ToolDecision(BaseModel):
     tool: str
-    query: str
+    query: str 
 
 class QueryRequest(BaseModel):
     query: str
